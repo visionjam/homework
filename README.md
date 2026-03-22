@@ -27,4 +27,4 @@
 
 2.不要有任何中文路径，默认要使用英文输入法
 
-3.[详情点这里](https://code.visualstudio.com/docs/cpp/config-mingw)
+3.[详情点这里](https://code.visualstudio.com/docs/cpp/config-mingw)和[这里](https://www.bilibili.com/video/BV1kR4y1M7R8/)
