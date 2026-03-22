@@ -22,3 +22,9 @@
 
 8.变量查找替换可以通过代入变量赋值来实现（python特色）
 
+## C++篇
+1.配置环境和编译器：C++，不是CPP
+
+2.不要有任何中文路径，默认要使用英文输入法
+
+3.[详情点这里](https://code.visualstudio.com/docs/cpp/config-mingw)
