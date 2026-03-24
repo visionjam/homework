@@ -47,9 +47,14 @@
 推荐入门：
 
 1.[鸟哥的 Linux 私房菜](https://vbird.org.cn/)
+
 2.b站视频：
 
 - https://www.bilibili.com/video/BV1tW42197za
 - https://www.bilibili.com/video/BV1jWPMzCEri
-- https://www.bilibili.com/video/BV1ko1SB4ES3 3.知乎：
-- https://zhuanlan.zhihu.com/p/621873601
+- https://www.bilibili.com/video/BV1ko1SB4ES3
+
+3.知乎：
+
+* 迁移文件：
+  https://zhuanlan.zhihu.com/p/621873601
