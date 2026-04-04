@@ -2,14 +2,14 @@ import random
 random.seed(400)
 a = []
 for i in range(0, 30):
-    b = random.randint(0, 101)
+    b = random.randint(0, 100)
     a += [b]
 
 def MyFun(scores, grade=5):
     excellent = 0
     good = 0
     medium = 0
-    pass_grade = 0
+    pass_grade =0
     fail = 0
 
     for score in scores:
@@ -35,8 +35,6 @@ def MyFun(scores, grade=5):
     elif grade == 1:
         print(f"不及格人数： {fail}")
 
-MyFun(a,3)
-
-MyFun(a,grade=4)
-
+MyFun(a, 3)
+MyFun(a, grade=4)
 MyFun(a)
