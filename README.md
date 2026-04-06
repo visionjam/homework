@@ -12,10 +12,10 @@
 
 1.for循环是以一个代码块来结算的，每一次变量代入都循环一次
 
-3.while循环是反向判定条件，直到不满足条件才结束循环
+2.while循环是反向判定条件，直到不满足条件才结束循环
 
+3.控制流的时序错位，做好初始变量表达式
 
--控制流的时序错位，做好初始变量表达式
 4.if语句是满足条件即进入分支
 
 5.代码初始化，写出变量。字符串，列表等
@@ -60,7 +60,13 @@
 - https://www.bilibili.com/video/BV1jWPMzCEri
 - https://www.bilibili.com/video/BV1ko1SB4ES3
 
-3.知乎：
+  3.知乎：
 
 * 迁移文件：
   https://zhuanlan.zhihu.com/p/621873601
+
+## javascript
+
+推荐学习资料：
+
+- https://wangdoc.com/javascript/
