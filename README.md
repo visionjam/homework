@@ -74,3 +74,16 @@
 推荐学习资料：
 
 - https://wangdoc.com/javascript/
+
+## SQL 篇（数据分析方向）
+
+实战练习在 [sql-practice/](sql-practice/README.md)：自带一套电商练习库（5 张表、约 2 万订单）、
+11 个由易到难的业务案例（日报 / 渠道对比 / TopN / 首单 / 复购 / 留存 / 漏斗 / 环比 / 对账 / 退款率 / RFM），
+写 SQL 后自动判分。
+
+```powershell
+cd sql-practice
+python db/build_db.py     # 生成练习库
+python tools/quiz.py      # 看题目
+python tools/quiz.py 3    # 做第 3 题
+```

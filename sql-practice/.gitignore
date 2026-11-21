@@ -1,0 +1,6 @@
+# 生成的练习库（可随时用 db/build_db.py 重建）
+db/shop.db
+
+# 本地进度与缓存
+cases/.progress
+__pycache__/

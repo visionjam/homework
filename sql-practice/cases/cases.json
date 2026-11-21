@@ -1,0 +1,158 @@
+{
+  "cases": [
+    {
+      "id": 1,
+      "file": "01_daily_gmv.sql",
+      "title": "经营日报：每日订单数与 GMV",
+      "topic": "聚合 / 日期过滤",
+      "difficulty": "★",
+      "background": "早会要看 2026-10-01 ~ 2026-10-07 这一周的每日经营日报：每天多少单、卖多少钱、客单价多少。",
+      "metric": "只统计 status='paid'；GMV = pay_amount 合计（含运费）；客单价 = GMV / 订单数。",
+      "hints": [
+        "order_date 是 TEXT，'2026-10-01' 这种格式可以直接比较",
+        "先 WHERE 过滤、再 GROUP BY，顺序写反会报错",
+        "COUNT(*) 与 COUNT(pay_amount) 在这里结果相同，但要养成先想清楚「统计什么」的习惯"
+      ]
+    },
+    {
+      "id": 2,
+      "file": "02_channel_compare.sql",
+      "title": "渠道效果对比（9–10 月）",
+      "topic": "GROUP BY / COUNT DISTINCT",
+      "difficulty": "★",
+      "background": "投放同学问：9、10 两个月，哪个下单渠道最能打？要订单数、买家数、GMV 和客单价。",
+      "metric": "按订单表 channel 分组；只算 paid；买家数按 user_id 去重。",
+      "hints": [
+        "COUNT(DISTINCT user_id) 才是买家数，COUNT(*) 是订单数",
+        "跨月用 order_date >= '2026-09-01' AND order_date < '2026-11-01' 比 BETWEEN 安全",
+        "排序可以直接用 SELECT 里的别名"
+      ]
+    },
+    {
+      "id": 3,
+      "file": "03_category_top3.sql",
+      "title": "每个品类的销售额 Top3 商品",
+      "topic": "窗口函数 ROW_NUMBER",
+      "difficulty": "★★",
+      "background": "选品会要每个品类卖得最好的 3 个商品，按销售额排。",
+      "metric": "商品粒度销售额 = SUM(quantity * unit_price)；只算 paid 订单；同额时按 product_id 升序兜底。",
+      "hints": [
+        "先在「商品」粒度做聚合，再在聚合结果上排名",
+        "ROW_NUMBER() OVER (PARTITION BY category ORDER BY amount DESC)",
+        "排名要在子查询/CTE 里算，外层才能用 rn <= 3 过滤"
+      ]
+    },
+    {
+      "id": 4,
+      "file": "04_first_order.sql",
+      "title": "每个用户的首单",
+      "topic": "窗口去重（取每组第一条）",
+      "difficulty": "★★",
+      "background": "用户运营要一份「每个用户首单」名单，用来发新人券：用户、首单日期、订单号、金额。",
+      "metric": "只算 paid；同一天有多单时取 order_id 最小的那单。",
+      "hints": [
+        "给每个用户的订单按 order_date 编号",
+        "ROW_NUMBER 的 ORDER BY 里加上 order_id，保证结果唯一",
+        "外层只保留 rn = 1"
+      ]
+    },
+    {
+      "id": 5,
+      "file": "05_repeat_rate.sql",
+      "title": "复购率",
+      "topic": "条件聚合 / 子查询",
+      "difficulty": "★★",
+      "background": "复盘会上被问：买过两次以上的人占多少？输出买家数、复购人数、复购率。",
+      "metric": "分母 = 有 paid 订单的用户数；分子 = paid 订单数 >= 2 的用户数。",
+      "hints": [
+        "先按用户聚合出 order_cnt",
+        "SUM(CASE WHEN order_cnt >= 2 THEN 1 ELSE 0 END) 是条件计数",
+        "乘 1.0 是为了避免整数除法（SQLite 的 / 对整数会取整）"
+      ]
+    },
+    {
+      "id": 6,
+      "file": "06_next_day_retention.sql",
+      "title": "9 月注册用户的次日留存",
+      "topic": "日期函数 / LEFT JOIN",
+      "difficulty": "★★★",
+      "background": "9 月拉新效果如何？看每天注册的用户里，第二天有没有下单。",
+      "metric": "分母 = 9 月注册用户；次日 = register_date + 1 天；当天有 paid 订单即算留存。按注册日期分组。",
+      "hints": [
+        "date(register_date, '+1 day') 是 SQLite 的日期加法",
+        "LEFT JOIN 之后要用 COUNT(rt.user_id) 而不是 COUNT(*)",
+        "COUNT(*) 会把没留存的人也数进去 —— 这是本题最大的坑"
+      ]
+    },
+    {
+      "id": 7,
+      "file": "07_funnel.sql",
+      "title": "10 月转化漏斗：浏览 → 加购 → 支付",
+      "topic": "条件聚合 / 用户去重",
+      "difficulty": "★★★",
+      "background": "产品经理要看 10 月的转化漏斗，判断卡在哪一步。",
+      "metric": "按用户去重，同一用户多次行为只算一次；输出各层人数和三层转化率。",
+      "hints": [
+        "先把每个用户的行为压成一行：MAX(CASE WHEN event_type='view' THEN 1 ELSE 0 END)",
+        "条件聚合比 COUNT(DISTINCT CASE ...) 更好扩展",
+        "算比率记得乘 1.0，SQLite 整数相除会变成 0"
+      ]
+    },
+    {
+      "id": 8,
+      "file": "08_dod.sql",
+      "title": "每日 GMV 与日环比",
+      "topic": "窗口函数 LAG",
+      "difficulty": "★★★",
+      "background": "日报要加一列「比昨天涨跌多少」，10 月起每天都要。",
+      "metric": "每日 GMV 只算 paid；dod = 今日 / 昨日 - 1，保留 4 位小数。",
+      "hints": [
+        "LAG(gmv) OVER (ORDER BY dt) 取上一行",
+        "窗口函数不能直接写在 WHERE 里，要先在 CTE 里算好",
+        "第一天没有「昨天」，dod 为 NULL 是正常的"
+      ]
+    },
+    {
+      "id": 9,
+      "file": "09_reconcile.sql",
+      "title": "对账：订单金额 vs 明细金额",
+      "topic": "预聚合再 JOIN",
+      "difficulty": "★★★",
+      "background": "财务说订单表金额和明细表加总对不上，让你按订单状态核对差额来源。",
+      "metric": "按 status 分组；pay_amount 含运费；cancelled 未付款，所以 pay_amount = 0。输出订单数、实付合计、商品金额合计、差额。",
+      "hints": [
+        "直接把 orders JOIN order_items 再 SUM(pay_amount)，金额会被明细行数放大",
+        "先把明细按订单聚合成一行，再 JOIN 回订单",
+        "算完看差额：paid 的差额是不是正好等于运费？cancelled 的差额是不是负数？"
+      ]
+    },
+    {
+      "id": 10,
+      "file": "10_refund_rate.sql",
+      "title": "各品类退款率",
+      "topic": "多对多口径 / COUNT DISTINCT",
+      "difficulty": "★★★",
+      "background": "品类运营想知道哪个品类退货最凶，好安排质检。",
+      "metric": "分母 = 该品类下 paid + refunded 的订单数（去重）；分子 = refunded 订单数（去重）。跨品类订单在每个品类各算一次。",
+      "hints": [
+        "一个订单有多个商品，必须 COUNT(DISTINCT order_id) 去重",
+        "条件计数：COUNT(DISTINCT CASE WHEN status='refunded' THEN order_id END)",
+        "CASE 不写 ELSE 时未命中返回 NULL，COUNT 会自动跳过"
+      ]
+    },
+    {
+      "id": 11,
+      "file": "11_rfm.sql",
+      "title": "RFM 用户分层（挑战）",
+      "topic": "NTILE / 综合",
+      "difficulty": "★★★★",
+      "background": "双十一前要给用户分层做差异化触达：高价值、新客/低频、流失预警、沉睡。",
+      "metric": "观察截止 2026-10-31，只算 paid；R = 距今天数，F = 订单数，M = 金额；三项各用 NTILE(4) 分四档（1 最小）。输出金额最高的 20 个用户。",
+      "hints": [
+        "julianday('2026-10-31') - julianday(last_order_date) 得到距今天数",
+        "NTILE(4) OVER (ORDER BY ...) 把排序后的人切成四等份",
+        "R 分数越小越近期活跃；F/M 分数越大越好 —— 先定方向再写 CASE"
+      ]
+    }
+  ]
+}
